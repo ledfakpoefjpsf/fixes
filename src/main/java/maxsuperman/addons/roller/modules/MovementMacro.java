@@ -1,4 +1,4 @@
-package com.kkllffaa.meteor_litematica_printer;
+package maxsuperman.addons.roller.modules;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -14,8 +14,6 @@ import java.util.List;
 public class MovementMacro extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgSlots  = settings.createGroup("Saved Macros");
-
-    // ── General ──────────────────────────────────────────────────────────────
 
     private final Setting<Boolean> recordingSetting = sgGeneral.add(new BoolSetting.Builder()
         .name("recording")
@@ -56,14 +54,9 @@ public class MovementMacro extends Module {
         .build()
     );
 
-    // ── Per-slot settings ─────────────────────────────────────────────────────
-
     private static final int MAX_SLOTS = 10;
-
     private final Setting<String>[]  slotNames   = new Setting[MAX_SLOTS];
     private final Setting<Boolean>[] slotEnabled = new Setting[MAX_SLOTS];
-
-    // ── Runtime state ─────────────────────────────────────────────────────────
 
     private static class Frame {
         boolean forward, backward, left, right, jump, sneak, sprint, attack, use;
@@ -91,18 +84,16 @@ public class MovementMacro extends Module {
 
     private boolean wasRecording  = false;
     private boolean lastKeyStatus = false;
-
     private int activeSlot   = -1;
     private int playIndex    = 0;
     private int repeatCount  = 0;
 
     @SuppressWarnings("unchecked")
     public MovementMacro() {
-        super(Addon.CATEGORY, "movement-macro", "Record movements, clicks/holds, save to slots, and play back.");
+        super(maxsuperman.addons.roller.Addon.CATEGORY, "movement-macro", "Record movements, clicks/holds, save to slots, and play back.");
 
         for (int i = 0; i < MAX_SLOTS; i++) {
             slots[i] = new ArrayList<>();
-
             final int slot = i; 
 
             slotNames[i] = sgSlots.add(new StringSetting.Builder()
@@ -129,43 +120,33 @@ public class MovementMacro extends Module {
         if (enabled) {
             if (slots[slot].isEmpty()) {
                 slotEnabled[slot].set(false);
-                mc.player.displayClientMessage(
-                    Component.literal("§c[Macro] §fSlot §e" + (slot + 1) + " §f(\"" + name + "\") is empty!"), false
-                );
+                mc.player.displayClientMessage(Component.literal("§c[Macro] §fSlot §e" + (slot + 1) + " is empty!"), false);
                 return;
             }
 
             if (activeSlot != -1 && activeSlot != slot) {
                 slotEnabled[activeSlot].set(false);
-                mc.player.displayClientMessage(
-                    Component.literal("§c[Macro] §fStopped §e\"" + slotNames[activeSlot].get() + "\""), false
-                );
             }
 
             activeSlot  = slot;
             playIndex   = 0;
             repeatCount = 0;
-
-            mc.player.displayClientMessage(
-                Component.literal("§a[Macro] §fPlaying §e\"" + name + "\" §f(" + slots[slot].size() + " ticks)"), false
-            );
+            mc.player.displayClientMessage(Component.literal("§a[Macro] §fPlaying §e\"" + name + "\""), false);
         } else {
             if (activeSlot == slot) {
                 activeSlot = -1;
                 restoreInputs();
-                mc.player.displayClientMessage(
-                    Component.literal("§c[Macro] §fStopped §e\"" + name + "\""), false
-                );
+                mc.player.displayClientMessage(Component.literal("§c[Macro] §fStopped §e\"" + name + "\""), false);
             }
         }
     }
 
     @Override
     public void onActivate() {
-        activeSlot    = -1;
-        playIndex     = 0;
-        repeatCount   = 0;
-        wasRecording  = false;
+        activeSlot = -1;
+        playIndex = 0;
+        repeatCount = 0;
+        wasRecording = false;
         lastKeyStatus = false;
         recording.clear();
     }
@@ -194,27 +175,17 @@ public class MovementMacro extends Module {
             recording.clear();
             if (activeSlot != -1) restoreInputs();
             wasRecording = true;
-            mc.player.displayClientMessage(
-                Component.literal("§c[Macro] §fRecording started! Saving to slot §e" + saveSlotSetting.get()), false
-            );
+            return;
         }
 
         if (!isRecording && wasRecording) {
             wasRecording = false;
-
-            if (recording.isEmpty()) {
-                mc.player.displayClientMessage(Component.literal("§c[Macro] §fNothing recorded!"), false);
-                return;
-            }
+            if (recording.isEmpty()) return;
 
             int targetSlot = saveSlotSetting.get() - 1;
             slots[targetSlot].clear();
             slots[targetSlot].addAll(recording);
             recording.clear();
-
-            mc.player.displayClientMessage(
-                Component.literal("§a[Macro] §fSaved §e" + slots[targetSlot].size() + " ticks to slot §e" + (targetSlot + 1)), false
-            );
             return;
         }
 
@@ -228,8 +199,8 @@ public class MovementMacro extends Module {
                 options.keyJump.isDown(),
                 options.keyShift.isDown(),
                 options.keySprint.isDown(),
-                options.keyAttack.isDown(), // Records clicks/hits
-                options.keyUse.isDown(),    // Records right-click holds/actions
+                options.keyAttack.isDown(),
+                options.keyUse.isDown(),
                 mc.player.getYRot(),
                 mc.player.getXRot()
             ));
@@ -263,8 +234,8 @@ public class MovementMacro extends Module {
         options.keyJump.setDown(frame.jump);
         options.keyShift.setDown(frame.sneak);
         options.keySprint.setDown(frame.sprint);
-        options.keyAttack.setDown(frame.attack); // Plays back click/hit status
-        options.keyUse.setDown(frame.use);       // Plays back hold/use status
+        options.keyAttack.setDown(frame.attack);
+        options.keyUse.setDown(frame.use);
         player.setYRot(frame.yaw);
         player.setXRot(frame.pitch);
     }
