@@ -1,6 +1,6 @@
 package maxsuperman.addons.roller;
 
-import maxsuperman.addons.roller.modules.MovementMacro; // Import your updated macro module
+import maxsuperman.addons.roller.modules.MovementMacro; // Ensure this matches your package structure
 import maxsuperman.addons.roller.modules.VillagerRoller;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
@@ -17,7 +17,7 @@ public class VillagerRollerAddon extends MeteorAddon {
 
         // Register Modules
         Modules.get().add(new VillagerRoller());
-        Modules.get().add(new MovementMacro()); // Registers the click/hold recording macro
+        Modules.get().add(new MovementMacro());
     }
 
     @Override
