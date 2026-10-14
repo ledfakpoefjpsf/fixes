@@ -83,20 +83,21 @@ tasks {
         }
     }
 
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(libs.versions.jdk.get().toInt()))
-        }
-    }
-
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.release = 25
+        options.release.set(libs.versions.jdk.get().toInt())
     }
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.jdk.get().toInt()))
+    }
+    withSourcesJar()
+}
+
 configurations.implementation {
-    exclude("club.minnced")// fuck you
+    exclude("club.minnced") // fuck you
 }
 
 fun getVersionMetadata(): String {
